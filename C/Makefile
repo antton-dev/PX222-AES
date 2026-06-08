@@ -10,4 +10,4 @@ decipher: decipher.c Aes.c Aes.h decipher.h
 	gcc -Wall -Wextra -o decipher decipher.c Aes.c
 
 clean:
-	rm -f fichier_test cipher decipher
+	rm -f fichier_test cipher decipher 
