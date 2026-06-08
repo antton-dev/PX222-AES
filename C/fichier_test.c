@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 #include "Aes.h"
 
 bool compare(uint8_t state1[4][4], uint8_t state2[4][4]) {
@@ -168,34 +169,52 @@ int main() {
     }
 
     // ---------------------------------------------------------
-    //                  TEST 7 : keyExpension
+    //          TEST 7 : keyExpension et AddRoundKey
     // ---------------------------------------------------------
 
     uint8_t output[44][4];
     uint8_t Cipher_key [16] = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
 
     keyExp(Cipher_key,output);
-    for(int i = 0; i < 40; i++){
-        printf("\n\n");
-        for(int j = 0; j < 4; j++){
-            printf("%02x", output[i][j]);
-        }
-    }   
+    
+    uint8_t attendu[4] = {0x2b, 0x7e, 0x15, 0x16};
+    uint8_t attendu2[4] = {0x57, 0x5c, 0x00, 0x6e};
 
+    printf("Test keyExpension : ");
+    if ((memcmp(output[0], attendu, 4) == 0) && ((memcmp(output[39], attendu2, 4) == 0))){
+        printf("True\n\n");
+    } else {
+        printf("False\n\n");
+    }
+    
     uint8_t State[4][4] = {
         {0x19, 0xa0, 0x9a, 0xe9},
         {0x3d, 0xf4, 0xc6, 0xf8},
         {0xe3, 0xe2, 0x8d, 0x48},
         {0xbe, 0x2b, 0x2a, 0x08} 
     };
+
     sub_bytes(State);
     shift_rows(State);
     mix_columns(State);
-    print_state(State);
 
     AddRoundKey(State, output,1);
-    printf("\n");
-    print_state(State);
+
+    uint8_t fin_AddRoundKey[4][4] ={
+        {0xa4, 0x68, 0x6b, 0x02}, 
+        {0x9c, 0x9f, 0x5b, 0x6a},
+        {0x7f, 0x35, 0xea, 0x50},
+        {0xf2, 0x2b, 0x43 ,0x49}
+    };
+
+    
+    printf("Test AddRoundKey : ");
+
+    if (compare(State, fin_AddRoundKey)) {
+        printf("True\n\n");
+    } else {
+        printf("False\n\n");
+    }
 
     return 0;
 }
