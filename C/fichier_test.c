@@ -167,5 +167,35 @@ int main() {
         printf("False\n\n");
     }
 
+    // ---------------------------------------------------------
+    //                  TEST 7 : keyExpension
+    // ---------------------------------------------------------
+
+    uint8_t output[44][4];
+    uint8_t Cipher_key [16] = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
+
+    keyExp(Cipher_key,output);
+    for(int i = 0; i < 40; i++){
+        printf("\n\n");
+        for(int j = 0; j < 4; j++){
+            printf("%02x", output[i][j]);
+        }
+    }   
+
+    uint8_t State[4][4] = {
+        {0x19, 0xa0, 0x9a, 0xe9},
+        {0x3d, 0xf4, 0xc6, 0xf8},
+        {0xe3, 0xe2, 0x8d, 0x48},
+        {0xbe, 0x2b, 0x2a, 0x08} 
+    };
+    sub_bytes(State);
+    shift_rows(State);
+    mix_columns(State);
+    print_state(State);
+
+    AddRoundKey(State, output,1);
+    printf("\n");
+    print_state(State);
+
     return 0;
 }

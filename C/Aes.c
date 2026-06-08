@@ -128,7 +128,6 @@ void SubWord(uint8_t word[4]) {
 
 
 void keyExp(uint8_t key[16], uint8_t w_output[44][4]) {
-    // Si ta clé est stockée ligne par ligne, utilise key[4*row + col]
     for (int col = 0; col < 4; col++) {
         for (int row = 0; row < 4; row++) {
             w_output[col][row] = key[4*col + row]; 
@@ -136,7 +135,7 @@ void keyExp(uint8_t key[16], uint8_t w_output[44][4]) {
     }
 
     uint8_t temp[4];
-    for (int i = 4; i < 44; i++) {
+    for (int i = 4; i < 40; i++) {
         for (int j = 0; j < 4; j++) {
             temp[j] = w_output[i-1][j];
         }
