@@ -1,12 +1,12 @@
 all: fichier_test cipher decipher
 
-fichier_test: fichier_test.c Aes.c
-	gcc -Wall -Wextra -O2 -o fichier_test fichier_test.c Aes.c
+fichier_test: fichier_test.c Aes.c Aes.h
+	gcc -Wall -Wextra -o fichier_test fichier_test.c Aes.c
 
-cipher: cipher.c Aes.c
+cipher: cipher.c Aes.c Aes.h cipher.h
 	gcc -Wall -Wextra -o cipher cipher.c Aes.c
 
-decipher: decipher.c Aes.c
+decipher: decipher.c Aes.c Aes.h decipher.h
 	gcc -Wall -Wextra -o decipher decipher.c Aes.c
 
 clean:
