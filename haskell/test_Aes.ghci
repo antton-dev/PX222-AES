@@ -1,0 +1,147 @@
+-- Script de test
+
+putStrLn("\nInstance WordAES")
+
+add (WordAES (P [un, zero, zero, zero])) (WordAES (P [un, zero]))
+-- WordAES (P [GF256 (P [Z2 1]), GF256 (P []), GF256 (P [Z2 1]), GF256 (P [])])
+
+mul (WordAES (P [un, zero])) (WordAES (P [un]) )
+-- WordAES (P [GF256 (P [Z2 1]), GF256 (P [])])
+
+mul (WordAES (P [un, zero, zero, zero])) (WordAES (P [un, zero]) )
+-- WordAES (P [GF256 (P [Z2 1])])
+
+
+-- ============================ Fonctions de Chiffrement ============================
+putStrLn("\nSbox")
+sBox (GF256 (P [zero, zero, zero, zero, zero, zero, zero, zero]))
+-- GF256 (P [Z2 1,Z2 1,Z2 1,Z2 0,Z2 1,Z2 1,Z2 0,Z2 1])
+
+sBox (GF256 (P [zero, un, zero, un, zero, zero, un, un]))
+-- GF256 (P [Z2 1,Z2 1,Z2 1,Z2 0,Z2 1,Z2 1,Z2 0,Z2 1])
+
+
+-- Selon l'exemple de la doc, page 33, ligne 1 (state of Round -> After SubBytes)
+let x19 = GF256 (P [zero, zero, zero, un, un , zero, zero, un])
+let x3d = GF256 (P [zero, zero, un, un, un, un, zero, un ])
+let xe3 = GF256 (P [un, un, un, zero, zero, zero, un, un ])
+let xbe = GF256 (P [un, zero, un, un, un, un, un, zero])
+let xa0 = GF256 (P [un, zero, un, zero, zero, zero, zero, zero])
+let xf4 = GF256 (P [un, un, un, un, zero, un, zero, zero])
+let xe2 = GF256 (P [un, un, un, zero, zero, zero, un, zero])
+let x2b = GF256 (P [zero, zero, un, zero, un , zero , un , un])
+let x9a = GF256 (P [un, zero, zero, un, un , zero, un, zero])
+let xc6 = GF256 (P [un, un, zero, zero, zero, un, un, zero])
+let x8d = GF256 (P [un, zero, zero, zero, un, un, zero, un])
+let x2a = GF256 (P [zero, zero, un, zero, un, zero, un, zero])
+let xe9 = GF256 (P [un, un , un , zero, un, zero, zero, un])
+let xf8 = GF256 (P [un, un, un, un, un, zero, zero, zero])
+let x48 = GF256 (P [zero, un, zero, zero, un , zero, zero, zero])
+let x08 = GF256 (P [zero, zero, zero, zero, un, zero, zero, zero])
+
+let col0 = WordAES (P [x19, x3d, xe3, xbe])
+let col1 = WordAES (P [xa0, xf4, xe2, x2b])
+let col2 = WordAES (P [x9a, xc6, x8d, x2a])
+let col3 = WordAES (P [xe9, xf8, x48, x08])
+
+let state = [col0, col1, col2, col3]
+
+putStrLn("\n state after subBytes")
+printState(subBytes state)
+-- [WordAES (P [GF256 (P [Z2 1,Z2 1,Z2 0,Z2 1,Z2 0,Z2 1,Z2 0,Z2 0]),GF256 (P [Z2 0,Z2 0,Z2 1,Z2 0,Z2 0,Z2 1,Z2 1,Z2 1]),GF256 (P [Z2 0,Z2 0,Z2 0,Z2 1,Z2 0,Z2 0,Z2 0,Z2 1]),GF256 (P [Z2 1,Z2 0,Z2 1,Z2 0,Z2 1,Z2 1,Z2 1,Z2 0])]),WordAES (P [GF256 (P [Z2 1,Z2 1,Z2 1,Z2 0,Z2 0,Z2 0,Z2 0,Z2 0]),GF256 (P [Z2 1,Z2 0,Z2 1,Z2 1,Z2 1,Z2 1,Z2 1,Z2 1]),GF256 (P [Z2 1,Z2 0,Z2 0,Z2 1,Z2 1,Z2 0,Z2 0,Z2 0]),GF256 (P [Z2 1,Z2 1,Z2 1,Z2 1,Z2 0,Z2 0,Z2 0,Z2 1])]),WordAES (P [GF256 (P [Z2 1,Z2 0,Z2 1,Z2 1,Z2 1,Z2 0,Z2 0,Z2 0]),GF256 (P [Z2 1,Z2 0,Z2 1,Z2 1,Z2 0,Z2 1,Z2 0,Z2 0]),GF256 (P [Z2 0,Z2 1,Z2 0,Z2 1,Z2 1,Z2 1,Z2 0,Z2 1]),GF256 (P [Z2 1,Z2 1,Z2 1,Z2 0,Z2 0,Z2 1,Z2 0,Z2 1])]),WordAES (P [GF256 (P [Z2 0,Z2 0,Z2 0,Z2 1,Z2 1,Z2 1,Z2 1,Z2 0]),GF256 (P [Z2 0,Z2 1,Z2 0,Z2 0,Z2 0,Z2 0,Z2 0,Z2 1]),GF256 (P [Z2 0,Z2 1,Z2 0,Z2 1,Z2 0,Z2 0,Z2 1,Z2 0]),GF256 (P [Z2 0,Z2 0,Z2 1,Z2 1,Z2 0,Z2 0,Z2 0,Z2 0])])]
+putStrLn("\n")
+
+putStrLn("state after subBytes and shift rows")
+printState(shift_rows (subBytes state))
+putStrLn("\n")
+
+putStrLn("state after subBytes, shift rows and mix columns")
+printState(mixColumns(shift_rows (subBytes state)))
+putStrLn("\n")
+
+putStrLn("inv_shift_rows appliqué à shift_rows")
+printState(inv_shift_rows(shift_rows (subBytes state)))
+putStrLn("\n")
+
+
+putStrLn("inv_Mix_Columns appliqué à mix_Columns")
+printState(inv_Mix_Columns(mixColumns(shift_rows (subBytes state))))
+putStrLn("\n")
+
+putStrLn("inv_subbytes")
+printState(inv_subBytes(subBytes state))
+putStrLn("\n")
+
+-- ============================ KEY EXPANSION ============================
+-- ============== AES 128 ==============
+let w0  = WordAES (P (map hex_to_bin ["2b", "7e", "15", "16"]))
+let w1  = WordAES (P (map hex_to_bin ["28", "ae", "d2", "a6"]))
+let w2  = WordAES (P (map hex_to_bin ["ab", "f7", "15", "88"]))
+let w3  = WordAES (P (map hex_to_bin ["09", "CF", "4F", "3c"]))
+
+let key_initiale_128 = [w0, w1, w2, w3]
+
+putStrLn("============== Key Expansion 128 ==============")
+printAllKeys (keyExpansion 128 key_initiale_128) 0
+
+-- ============== AES 192 ============== 
+let k00 = hex_to_bin "8E"
+let k10 = hex_to_bin "73"
+let k20 = hex_to_bin "B0"
+let k30 = hex_to_bin "F7"
+
+let w0  = WordAES (P [k00, k10, k20, k30])
+
+let k01 = hex_to_bin "da"
+let k11 = hex_to_bin "0e"
+let k21 = hex_to_bin "64"
+let k31 = hex_to_bin "52"
+let w1  = WordAES (P [k01, k11, k21, k31])
+
+
+let k02 = hex_to_bin "C8"
+let k12 = hex_to_bin "10"
+let k22 = hex_to_bin "F3"
+let k32 = hex_to_bin "2B"
+let w2  = WordAES (P [k02, k12, k22, k32])
+
+let k03 = hex_to_bin "80"
+let k13 = hex_to_bin "90"
+let k23 = hex_to_bin "79"
+let k33 = hex_to_bin "E5"
+
+let w3  = WordAES (P [k03, k13, k23, k33])
+
+let k04 = hex_to_bin "62"
+let k14 = hex_to_bin "F8"
+let k24 = hex_to_bin "EA"
+let k34 = hex_to_bin "D2"
+
+let w4  = WordAES (P [k04, k14, k24, k34])
+
+let k05 = hex_to_bin "52"
+let k15 = hex_to_bin "2C"
+let k25 = hex_to_bin "6B"
+let k35 = hex_to_bin "7B"
+
+let w5  = WordAES (P [k05, k15, k25, k35])
+
+let key_initiale_192 = [w0, w1, w2, w3, w4, w5]
+
+putStrLn("\n============== AES 192 ==============")
+printAllKeys (keyExpansion 192 key_initiale_192) 0
+
+
+-- ============== AES 128 ==============
+let w0 = WordAES (P (map hex_to_bin ["60", "3D", "EB", "10"]))
+let w1 = WordAES (P (map hex_to_bin ["15", "ca", "71", "be"]))
+let w2 = WordAES (P (map hex_to_bin ["2B", "73", "ae", "f0"]))
+let w3 = WordAES (P (map hex_to_bin ["85", "7d", "77", "81"]))
+let w4 = WordAES (P (map hex_to_bin ["1f", "35", "2c", "07"]))
+let w5 = WordAES (P (map hex_to_bin ["3B", "61", "08", "d7"]))
+let w6 = WordAES (P (map hex_to_bin ["2D", "98", "10", "a3"]))
+let w7 = WordAES (P (map hex_to_bin ["09", "14", "df", "f4"]))
+
+key_initiale_256 = [w0, w1, w2, w3, w4, w5, w6, w7]
+putStrLn("\n============== AES 256 ==============")
+printAllKeys (keyExpansion 256 key_initiale_256) 0

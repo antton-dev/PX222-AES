@@ -1,0 +1,70 @@
+
+-- ================= CIPHER 128 =================
+-- Documentation, Annexe B
+-- Input = 32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34
+
+let in_w0 = WordAES (P (map hex_to_bin ["32", "43", "F6", "A8"]))
+let in_w1 = WordAES (P (map hex_to_bin ["88", "5a", "30", "8d"]))
+let in_w2 = WordAES (P (map hex_to_bin ["31", "31", "98", "a2"]))
+let in_w3 = WordAES (P (map hex_to_bin ["E0", "37", "07", "34"]))
+
+let input128 = [in_w0, in_w1, in_w2, in_w3]
+
+-- Key  =  2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 CF 4F 3c
+let w0  = WordAES (P (map hex_to_bin ["2b", "7e", "15", "16"]))
+let w1  = WordAES (P (map hex_to_bin ["28", "ae", "d2", "a6"]))
+let w2  = WordAES (P (map hex_to_bin ["ab", "f7", "15", "88"]))
+let w3  = WordAES (P (map hex_to_bin ["09", "CF", "4F", "3c"]))
+
+let key128 = [w0, w1, w2, w3]
+
+putStrLn("================= AES 128 =================")
+printState (cipher 128 input128 key128)
+
+
+-- ================= CIPHER 192 =================
+-- Documentation, Annexe C.2
+-- input = 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff
+
+let in_w0 = WordAES (P (map hex_to_bin ["00", "11", "22", "33"]))
+let in_w1 = WordAES (P (map hex_to_bin ["44", "55", "66", "77"]))
+let in_w2 = WordAES (P (map hex_to_bin ["88", "99", "aa", "bb"]))
+let in_w3 = WordAES (P (map hex_to_bin ["cc", "dd", "ee", "ff"]))
+let input192 = [in_w0, in_w1, in_w2, in_w3]
+
+-- Key = 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f 10 11 12 13 14 15 16 17
+let w0 = WordAES (P (map hex_to_bin ["00", "01", "02", "03"]))
+let w1 = WordAES (P (map hex_to_bin ["04", "05", "06", "07"]))
+let w2 = WordAES (P (map hex_to_bin ["08", "09", "0a", "0b"]))
+let w3 = WordAES (P (map hex_to_bin ["0c", "0d", "0e", "0f"]))
+let w4 = WordAES (P (map hex_to_bin ["10", "11", "12", "13"]))
+let w5 = WordAES (P (map hex_to_bin ["14", "15", "16", "17"]))
+let key192 = [w0, w1, w2, w3, w4, w5]
+
+putStrLn("================= AES 192 =================")
+printState (cipher 192 input192 key192)
+
+-- ================= CIPHER 192 =================
+-- Documentation, Annexe C.3
+-- input = 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff
+let input256 = [in_w0, in_w1, in_w2, in_w3] -- (identique AES 192)
+
+-- Key = 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f
+let w6 = WordAES (P (map hex_to_bin ["18", "19", "1a", "1b"]))
+let w7 = WordAES (P (map hex_to_bin ["1c", "1d", "1e", "1f"]))
+let key256 = [w0, w1, w2, w3, w4, w5, w6, w7]
+
+putStrLn("================= AES 256 =================")
+printState (cipher 256 input256 key256)
+
+putStrLn("====== Version brute (à récuperer pour le déchiffrement) ======")
+
+putStrLn("AES 128")
+cipher 128 input128 key128
+putStrLn("--------")
+putStrLn("AES 192")
+cipher 192 input192 key192
+putStrLn("--------")
+putStrLn("AES 256")
+cipher 256 input256 key256
+

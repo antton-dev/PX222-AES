@@ -1,0 +1,47 @@
+-- Script de test
+
+putStrLn("\n Addition")
+add (P (map Z2 [1,0,1,0]))  (P (map Z2 [1,1,0,1])) 
+-- P [Z2 1,Z2 1,Z2 1]
+
+add (P [] :: P Z2) (P [] :: P Z2)
+-- P []
+
+add (P (map Z2 [1, 1, 0])) (P (map Z2 [1, 0, 1, 0, 1, 0])) -- P [Z2 1,Z2 0,Z2 1,Z2 1,Z2 0,Z2 0]
+putStrLn("\n")
+
+
+putStrLn("\n Multiplication")
+mul (P (map Z2 [1,0,1,0])) (P (map Z2 [1,0,1,0]))
+-- P [Z2 1,Z2 0,Z2 0,Z2 0,Z2 1,Z2 0,Z2 0]
+
+mul (P [] :: P Z2) (P [] :: P Z2)
+-- P []
+
+mul (P (map Z2 [1, 1, 0])) (P (map Z2 [1,1,1,0])) 
+-- P [Z2 1,Z2 0,Z2 0,Z2 1,Z2 0,Z2 0]
+putStrLn("\n")
+
+
+putStrLn("\n division euclidienne")
+div_eucli (P (map Z2 [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1])) (P (map Z2 [1, 1, 0, 0, 1]))
+-- Just (P [Z2 1,Z2 1,Z2 1,Z2 1,Z2 1,Z2 0,Z2 1,Z2 0,Z2 1,Z2 1],P [Z2 1,Z2 0,Z2 0,Z2 0])
+
+div_eucli (P (map Z2 [1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1])) (P (map Z2 [1, 0, 0, 0, 1, 1, 0, 1, 1]))
+-- Just (P [Z2 1,Z2 0,Z2 1,Z2 0,Z2 0,Z2 0],P [Z2 1,Z2 1,Z2 0,Z2 0,Z2 0,Z2 0,Z2 0,Z2 1])
+putStrLn("\n")
+
+putStrLn("\n Euclide etendu")
+euclide_etendu (P (map Z2 [1, 1, 1])) (P (map Z2 [1, 1]))
+-- Just (P [Z2 1], P [Z2 1], P [Z2 0,Z2 1])
+
+putStrLn("\n Inverse Modulaire")
+                        -- m(X) = X^8 + X^4 + X^3 + X + 1
+inverse_modulaire (P (map Z2 [1, 1, 0, 1, 1, 0, 0, 0, 1])) (P (map Z2 [1]))
+-- Just (P [Z2 1])
+
+inverse_modulaire (P (map Z2 [1, 0, 0, 0, 1, 1, 0, 1, 1])) (P (map Z2 [1, 0]))
+-- Just (P [Z2 1,Z2 0,Z2 1,Z2 1,Z2 0,Z2 0,Z2 0,Z2 1])
+
+inverse_modulaire (P (map Z2 [1, 1])) (P (map Z2 [1, 0, 1]))
+-- Nothing
