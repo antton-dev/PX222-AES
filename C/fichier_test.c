@@ -14,13 +14,120 @@ bool compare(uint8_t state1[4][4], uint8_t state2[4][4]) {
 
 int main() {
     // ---------------------------------------------------------
-    //                     TEST 1 : MixColumns 
+    //                     TEST 1 : sub_bytes
+    // ---------------------------------------------------------
+    uint8_t debut_SubBytes[4][4] = {
+        {0x19, 0xa0, 0x9a, 0xe9},
+        {0x3d, 0xf4, 0xc6, 0xf8},
+        {0xe3, 0xe2, 0x8d, 0x48},
+        {0xbe, 0x2b, 0x2a, 0x08} 
+    };
+
+    uint8_t fin_SubBytes[4][4] = {
+        {0xd4, 0xe0, 0xb8, 0x1e}, 
+        {0x27, 0xbf, 0xb4, 0x41}, 
+        {0x11, 0x98, 0x5d, 0x52}, 
+        {0xae, 0xf1, 0xe5, 0x30} 
+    };
+
+    sub_bytes(debut_SubBytes);
+    printf("Test SubBytes : ");
+
+    if (compare(debut_SubBytes, fin_SubBytes)) {
+        printf("True\n\n");
+    } else {
+        printf("False\n\n");
+    }
+
+    // ---------------------------------------------------------
+    //                     TEST 2 : inv_sub_bytes
+    // ---------------------------------------------------------
+
+    uint8_t fin_InvSubBytes[4][4] = {
+        {0x19, 0xa0, 0x9a, 0xe9},
+        {0x3d, 0xf4, 0xc6, 0xf8},
+        {0xe3, 0xe2, 0x8d, 0x48},
+        {0xbe, 0x2b, 0x2a, 0x08} 
+    };
+
+    uint8_t debut_InvSubBytes[4][4] = {
+        {0xd4, 0xe0, 0xb8, 0x1e}, 
+        {0x27, 0xbf, 0xb4, 0x41}, 
+        {0x11, 0x98, 0x5d, 0x52}, 
+        {0xae, 0xf1, 0xe5, 0x30} 
+    };
+
+    inv_sub_bytes(debut_InvSubBytes);
+    printf("Test InvSubBytes : ");
+
+    if (compare(debut_InvSubBytes, fin_InvSubBytes)) {
+        printf("True\n\n");
+    } else {
+        printf("False\n\n");
+    }
+
+    // ---------------------------------------------------------
+    //                     TEST 3 : shift_rows
+    // ---------------------------------------------------------
+
+    uint8_t debut_ShiftRows[4][4] = {
+        {0xd4, 0xe0, 0xb8, 0x1e}, 
+        {0x27, 0xbf, 0xb4, 0x41}, 
+        {0x11, 0x98, 0x5d, 0x52}, 
+        {0xae, 0xf1, 0xe5, 0x30} 
+    };
+
+    uint8_t fin_ShiftRows[4][4] = {
+        {0xd4, 0xe0, 0xb8, 0x1e},
+        {0xbf, 0xb4, 0x41, 0x27},
+        {0x5d, 0x52, 0x11, 0x98},
+        {0x30, 0xae, 0xf1, 0xe5} 
+    };
+    shift_rows(debut_ShiftRows);
+
+    printf("Test ShiftRows : ");
+
+    if (compare(debut_ShiftRows, fin_ShiftRows)) {
+        printf("True\n\n");
+    } else {
+        printf("False\n\n");
+    }
+
+    // ---------------------------------------------------------
+    //                     TEST 4 : inv_shift_rows
+    // ---------------------------------------------------------
+    
+    uint8_t fin_InvShiftRows[4][4] = {
+        {0xd4, 0xe0, 0xb8, 0x1e}, 
+        {0x27, 0xbf, 0xb4, 0x41}, 
+        {0x11, 0x98, 0x5d, 0x52}, 
+        {0xae, 0xf1, 0xe5, 0x30} 
+    };
+
+    uint8_t debut_InvShiftRows[4][4] = {
+        {0xd4, 0xe0, 0xb8, 0x1e},
+        {0xbf, 0xb4, 0x41, 0x27},
+        {0x5d, 0x52, 0x11, 0x98},
+        {0x30, 0xae, 0xf1, 0xe5} 
+    };
+    inv_shift_rows(debut_InvShiftRows);
+
+    printf("Test InvShiftRows : ");
+
+    if (compare(debut_InvShiftRows, fin_InvShiftRows)) {
+        printf("True\n\n");
+    } else {
+        printf("False\n\n");
+    }
+
+    // ---------------------------------------------------------
+    //                     TEST 5 : MixColumns 
     // ---------------------------------------------------------
     uint8_t debut_mix[4][4] = {
         {0xd4, 0xe0, 0xb8, 0x1e},
         {0xbf, 0xb4, 0x41, 0x27},
         {0x5d, 0x52, 0x11, 0x98},
-        {0x30, 0xae, 0xf1, 0xe5} // 0xe5
+        {0x30, 0xae, 0xf1, 0xe5} 
     };
 
     uint8_t attendu_mix[4][4] = {
@@ -40,7 +147,7 @@ int main() {
     }
 
     // ---------------------------------------------------------
-    //                  TEST 2 : InvMixColumns
+    //                  TEST 6 : InvMixColumns
     // ---------------------------------------------------------
     
     uint8_t debut[4][4] = {
