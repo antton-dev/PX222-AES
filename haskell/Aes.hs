@@ -14,6 +14,7 @@ module Aes where
 import Structures
 import Math
 import Numeric (showHex, readHex)
+import Data.List (intercalate)
 
 type State = [WordAES]
 
@@ -311,3 +312,21 @@ hex_to_bin :: String -> GF256 Z2
 hex_to_bin str = 
     case readHex str of
         [(val, "")] -> int_to_bin val
+
+
+
+
+-- Generate Sbox ready for C code
+
+enum_GF256 :: [GF256 Z2]
+enum_GF256 = [int_to_bin x | x <- [0..255]]
+
+generate_sbox :: [String]
+generate_sbox = [ "0x" ++ showHexByte (sBox x) | x <- enum_GF256]
+
+generate_sbox_formatted :: IO()
+generate_sbox_formatted = do
+    let resultat =  intercalate ", " generate_sbox
+    putStrLn "static const uint8_t sbox[256] = {"
+    putStrLn (resultat)
+    putStrLn "};" 

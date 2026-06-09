@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdint.h> 
+#include <stdlib.h>
 #include "Aes.h"
+
+typedef uint8_t state;
+typedef uint8_t word;
 
 static const uint8_t sbox[256] = {
   0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
@@ -40,7 +44,7 @@ static const uint8_t inverse_sbox[256] = {
   0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61,
   0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d };
 
-void print_state(uint8_t State[4][4]) {
+void print_state(state State[4][4]) {
     for(int ligne = 0; ligne < 4; ligne++) {
         for(int col = 0; col < 4; col++) {
             printf("%02x ", State[ligne][col]); 
@@ -50,7 +54,7 @@ void print_state(uint8_t State[4][4]) {
     printf("\n");
 }
 
-void sub_bytes(uint8_t State[4][4]) {
+void sub_bytes(state State[4][4]) {
     for (int ligne = 0; ligne < 4; ligne++) {
         for (int col = 0; col < 4; col++) {
             uint8_t byte = State[ligne][col];
@@ -59,8 +63,8 @@ void sub_bytes(uint8_t State[4][4]) {
     }
 }
 
-void shift_rows(uint8_t State[4][4]) {
-    uint8_t temp;
+void shift_rows(state State[4][4]) {
+    state temp;
 
     temp = State[1][0];
     State[1][0] = State[1][1];
@@ -93,8 +97,8 @@ uint8_t mul_03(uint8_t x) {
     return mul_02(x) ^ x;
 }
 
-void mix_columns(uint8_t State[4][4]) {
-    uint8_t State_0, State_1, State_2, State_3;
+void mix_columns(state State[4][4]) {
+    state State_0, State_1, State_2, State_3;
 
     for(int i = 0; i < 4; i++) {
         State_0 = mul_02(State[0][i])   ^ mul_03(State[1][i])         ^        State[2][i]        ^        State[3][i];
@@ -110,7 +114,7 @@ void mix_columns(uint8_t State[4][4]) {
 }
 
 // RotWord
-void RotWord(uint8_t word[4]) {
+void RotWord(word word[4]) {
     uint8_t tmp = word[0];
     word[0] = word[1];
     word[1] = word[2];
@@ -118,7 +122,7 @@ void RotWord(uint8_t word[4]) {
     word[3] = tmp;
 }
 
-void SubWord(uint8_t word[4]) {
+void SubWord(word word[4]) {
     for (int i=0; i<4; i++) {
         uint8_t byte = word[i];
         word[i] = sbox[byte];
@@ -127,32 +131,42 @@ void SubWord(uint8_t word[4]) {
 
 
  
-void keyExp(uint8_t key[16], uint8_t w_output[44][4]) {
-    for (int col = 0; col < 4; col++) {
+void keyExp(word *key, uint8_t w_output[60][4], int key_length) {
+    int round = 0;
+
+    if(key_length == 4) round = 10;
+    else if(key_length == 6) round = 12;
+    else if(key_length == 8) round = 14;
+    else exit(1);
+
+    for (int col = 0; col < key_length; col++) {
         for (int row = 0; row < 4; row++) {
             w_output[col][row] = key[4*col + row]; 
         }
     }
 
     uint8_t temp[4];
-    for (int i = 4; i < 44; i++) {
+    for (int i = key_length; i < 4 * (round + 1); i++) {
         for (int j = 0; j < 4; j++) {
             temp[j] = w_output[i-1][j];
         }
 
-        if (i % 4 == 0) {
+        if (i % key_length == 0) {
             RotWord(temp);
             SubWord(temp);
-            temp[0] ^= Rcon[(i/4) - 1];
+            temp[0] ^= Rcon[(i / key_length) - 1];
+        } 
+        else if (key_length == 8 && (i % 8 == 4)) {
+            SubWord(temp);
         }
 
         for (int j = 0; j < 4; j++) {
-            w_output[i][j] = w_output[i-4][j] ^ temp[j];
+            w_output[i][j] = w_output[i - key_length][j] ^ temp[j];
         }
     }
 }
 
-void AddRoundKey(uint8_t State[4][4], uint8_t w_output[44][4], int round) {
+void AddRoundKey(state State[4][4], uint8_t w_output[60][4], int round) {
     int base = round * 4; 
     for (int col = 0; col < 4; col++) {
         for (int row = 0; row < 4; row++) {
@@ -161,9 +175,9 @@ void AddRoundKey(uint8_t State[4][4], uint8_t w_output[44][4], int round) {
     }
 }
 
-void inv_shift_rows(uint8_t State[4][4]) {
+void inv_shift_rows(state State[4][4]) {
 
-    uint8_t temp,temp2;
+    state temp,temp2;
     
     temp = State[1][3];
     State[1][3] = State[1][2];
@@ -185,7 +199,7 @@ void inv_shift_rows(uint8_t State[4][4]) {
     State[3][3] = temp;
 }
 
-void inv_sub_bytes(uint8_t State[4][4]) {
+void inv_sub_bytes(state State[4][4]) {
     for (int ligne = 0; ligne < 4; ligne++) {
         for (int col = 0; col < 4; col++) {
             uint8_t byte = State[ligne][col];
@@ -222,8 +236,8 @@ uint8_t mul_0e(uint8_t x) {
     return x8 ^ x4 ^ x2;          
 }
 
-void inv_mix_columns(uint8_t State[4][4]) {
-    uint8_t State_0, State_1, State_2, State_3;
+void inv_mix_columns(state State[4][4]) {
+    state State_0, State_1, State_2, State_3;
 
     for(int i = 0; i < 4; i++) {
         State_0 = mul_0e(State[0][i]) ^ mul_0b(State[1][i]) ^ mul_0d(State[2][i]) ^ mul_09(State[3][i]);

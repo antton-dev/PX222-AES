@@ -145,3 +145,9 @@ let w7 = WordAES (P (map hex_to_bin ["09", "14", "df", "f4"]))
 key_initiale_256 = [w0, w1, w2, w3, w4, w5, w6, w7]
 putStrLn("\n============== AES 256 ==============")
 printAllKeys (keyExpansion 256 key_initiale_256) 0
+
+
+
+-- Test génération sbox --
+putStrLn "\n Génération de la Sbox pour l'implémentation en C"
+generate_sbox_formatted

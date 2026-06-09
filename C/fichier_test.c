@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
 #include "Aes.h"
 #include "cipher.h"
 #include "decipher.h"
@@ -184,10 +185,10 @@ int main() {
     //          TEST 7 : keyExpension et AddRoundKey
     // ---------------------------------------------------------
 
-    uint8_t output[44][4];
+    uint8_t output[60][4];
     uint8_t Cipher_key [16] = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
 
-    keyExp(Cipher_key,output);
+    keyExp(Cipher_key,output,4);
     
     uint8_t attendu[4] = {0x2b, 0x7e, 0x15, 0x16};
     uint8_t attendu2[4] = {0x57, 0x5c, 0x00, 0x6e};
@@ -242,7 +243,7 @@ int main() {
     uint8_t AES128_output[4][4];
     uint8_t AES128_attendu[4][4] = {{0x39, 0x02, 0xdc, 0x19}, {0x25, 0xdc, 0x11, 0x6a}, {0x84, 0x09, 0x85, 0x0b}, {0x1d, 0xfb, 0x97, 0x32}};
     
-    cipher(cipher_input, key, AES128_output);
+    aes_encrypt(AES128_output, cipher_input, key, 4);
 
     printf("Test cipher AES-128 : ");
 
@@ -250,7 +251,7 @@ int main() {
         printf("True\n\n");
     } else {
         printf("False\n\n");
-    }
+    } 
 
     print_state(AES128_output);
 
@@ -260,11 +261,19 @@ int main() {
     //          TEST 9 : Déchiffrement AES-128 
     //          D'après l'annexe B de la documentation
     // ---------------------------------------------------------
-    uint8_t decipher_input[4][4] = {{0x39, 0x02, 0xdc, 0x19}, {0x25, 0xdc, 0x11, 0x6a}, {0x84, 0x09, 0x85, 0x0b}, {0x1d, 0xfb, 0x97, 0x32}};
+    uint8_t decipher_input[4][4] = 
+        {{0x39, 0x02, 0xdc, 0x19},
+         {0x25, 0xdc, 0x11, 0x6a}, 
+         {0x84, 0x09, 0x85, 0x0b}, 
+         {0x1d, 0xfb, 0x97, 0x32}};
     
-    uint8_t decipher_AES128_attendu[4][4] = {{0x32, 0x88, 0x31, 0xe0},{0x43, 0x5a, 0x31, 0x37}, {0xf6, 0x30, 0x98, 0x07}, {0xa8, 0x8d, 0xa2, 0x34}};
+    uint8_t decipher_AES128_attendu[4][4] = 
+        {{0x32, 0x88, 0x31, 0xe0},
+         {0x43, 0x5a, 0x31, 0x37}, 
+         {0xf6, 0x30, 0x98, 0x07}, 
+         {0xa8, 0x8d, 0xa2, 0x34}};
 
-    decipher(decipher_input, key, AES128_output);
+    aes_decrypt(AES128_output, decipher_input, key, 4);
 
     printf("Test decipher AES-128 : ");
 
@@ -275,6 +284,152 @@ int main() {
     }
 
     print_state(AES128_output);
+
+
+    // ---------------------------------------------------------
+    //          TEST 9 : Chiffrement AES-192 
+    //          D'après l'annexe B de la documentation
+    // ---------------------------------------------------------
+
+    uint8_t key_192[24] = {
+        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+        0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+        0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17
+    };
+
+    uint8_t cipher_input_192[4][4] = {
+        {0x00, 0x44, 0x88, 0xcc},
+        {0x11, 0x55, 0x99, 0xdd},
+        {0x22, 0x66, 0xaa, 0xee},
+        {0x33, 0x77, 0xbb, 0xff}
+    };
+
+    uint8_t AES192_output[4][4];
+
+    uint8_t AES192_attendu[4][4] = {
+        {0xdd, 0x86, 0x6e, 0xec},
+        {0xa9, 0x4c, 0xaf, 0x0d},
+        {0x7c, 0xdf, 0x70, 0x71},
+        {0xa4, 0xe0, 0xa0, 0x91}
+    };
+    
+    aes_encrypt(AES192_output, cipher_input_192, key_192, 6);
+
+    printf("Test cipher AES-192 : ");
+
+    if (compare(AES192_output, AES192_attendu)) {
+        printf("True\n\n");
+    } else {
+        printf("False\n\n");
+    }
+
+    print_state(AES192_output);
+
+    // ---------------------------------------------------------
+    //          TEST 10 : Déchiffrement AES-192 
+    //          D'après l'annexe B de la documentation
+    // ---------------------------------------------------------
+
+    uint8_t decipher_input_192[4][4] = {
+        {0xdd, 0x86, 0x6e, 0xec},
+        {0xa9, 0x4c, 0xaf, 0x0d},
+        {0x7c, 0xdf, 0x70, 0x71},
+        {0xa4, 0xe0, 0xa0, 0x91}
+    };
+
+    uint8_t AES192_decipher_output[4][4];
+    
+    uint8_t AES192_decipher_attendu[4][4] = {
+        {0x00, 0x44, 0x88, 0xcc},
+        {0x11, 0x55, 0x99, 0xdd},
+        {0x22, 0x66, 0xaa, 0xee},
+        {0x33, 0x77, 0xbb, 0xff}
+    };
+
+    aes_decrypt(AES192_decipher_output, decipher_input_192, key_192, 6);
+
+    printf("Test decipher AES-192 : ");
+
+    if (compare(AES192_decipher_output, AES192_decipher_attendu)) {
+        printf("True\n\n");
+    } else {
+        printf("False\n\n");
+    }
+
+    print_state(AES192_decipher_output);
+
+        // ---------------------------------------------------------
+    //          TEST 11 : Chiffrement AES-256 
+    //          D'après l'annexe B de la documentation
+    // ---------------------------------------------------------
+
+    uint8_t key_256[32] = {
+        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+        0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+        0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+        0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
+    };
+
+    uint8_t cipher_input_256[4][4] = {
+        {0x00, 0x44, 0x88, 0xcc},
+        {0x11, 0x55, 0x99, 0xdd},
+        {0x22, 0x66, 0xaa, 0xee},
+        {0x33, 0x77, 0xbb, 0xff}
+    };
+
+    uint8_t AES256_output[4][4];
+
+    uint8_t AES256_attendu[4][4] = {
+        {0x8e, 0x51, 0xea, 0x4b},
+        {0xa2, 0x67, 0xfc, 0x49},
+        {0xb7, 0x45, 0x49, 0x60},
+        {0xca, 0xbf, 0x90, 0x89}
+    };
+    
+    aes_encrypt(AES256_output, cipher_input_256, key_256, 8);
+
+    printf("Test cipher AES-256 : ");
+
+    if (compare(AES256_output, AES256_attendu)) {
+        printf("True\n\n");
+    } else {
+        printf("False\n\n");
+    }
+
+    print_state(AES256_output);
+
+    // ---------------------------------------------------------
+    //          TEST 12 : Déchiffrement AES-256 
+    //          D'après l'annexe B de la documentation
+    // ---------------------------------------------------------
+
+    uint8_t decipher_input_256[4][4] = {
+        {0x8e, 0x51, 0xea, 0x4b},
+        {0xa2, 0x67, 0xfc, 0x49},
+        {0xb7, 0x45, 0x49, 0x60},
+        {0xca, 0xbf, 0x90, 0x89}
+    };
+
+    uint8_t AES256_decipher_output[4][4];
+    
+    uint8_t AES256_decipher_attendu[4][4] = {
+        {0x00, 0x44, 0x88, 0xcc},
+        {0x11, 0x55, 0x99, 0xdd},
+        {0x22, 0x66, 0xaa, 0xee},
+        {0x33, 0x77, 0xbb, 0xff}
+    };
+
+    aes_decrypt(AES256_decipher_output, decipher_input_256, key_256, 8);
+
+    printf("Test decipher AES-256 : ");
+
+    if (compare(AES256_decipher_output, AES256_decipher_attendu)) {
+        printf("True\n\n");
+    } else {
+        printf("False\n\n");
+    }
+
+    print_state(AES256_decipher_output);
 
     return 0;
 }
